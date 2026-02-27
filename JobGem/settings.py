@@ -145,3 +145,22 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ==================== SIMPLE JWT CONFIGURATION =======================
+
+from datetime import timedelta
+SIMPLE_JWT = {
+    'AUTHENTICATION_METHOD':'email',
+    
+    'USER_ID_FIEED':'id',
+    'USER_ID_CLAIM':'user_id',
+    
+    'ACCESS_TOKEN_LIFETIME':timedelta(hours=5),
+    'REFRESH_TOKEN_LIFETIME':timedelta(days=7),
+    
+    'TOKEN_OBTAIN_SERIALIZER':'user.seralizers.CustomTokenObtainPairSerializer',
+    
+    'AUTH_HEADER_TYPES':('Bearer',),
+    
+    'TOKEN_USER_CLASS':'user.User'
+}

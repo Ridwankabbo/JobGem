@@ -15,7 +15,7 @@ from .serializer import (
 """
 @api_view(['POST'])
 def UserRegistrationView(request):
-    serializer = UserRegistrationSerializer(request.data)
+    serializer = UserRegistrationSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)
@@ -28,7 +28,7 @@ def UserRegistrationView(request):
 """
 @api_view(['POST'])
 def AccountVerificationView(request):
-    serializer = AccountVerificationByOtpSerializer(request.data)
+    serializer = AccountVerificationByOtpSerializer(data=request.data)
     if serializer.is_valid():
         email = serializer.validated_data.get('email')
         otp = serializer.validated_data.get('otp')
@@ -42,10 +42,12 @@ def AccountVerificationView(request):
                 return Response({
                     "response":"Account successfully verified"
                 })
+            return Response({"response":"OTP isn't valid"})
         except User.DoesNotExist:
             return Response({
                 "response":"User doesn't found"
             })
+    return Response(serializer.errors)
     
 
 

@@ -2,9 +2,15 @@ from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 # Create your models here.
 
+
+""" 
+    ==========================
+        CUSTOM USER MODEL 
+    ==========================
+"""
 class CustomUserModel(BaseUserManager):
     
-    def creat_user(self, email, username, password, **extra_fields):
+    def create_user(self, email, username, password, **extra_fields):
         if not email:
             raise ValueError("Email must require")
         
@@ -15,8 +21,8 @@ class CustomUserModel(BaseUserManager):
         
         return user
     
-    def creat_superuser(self, email, username, password=None, **extre_fields):
-        user = self.creat_user(email, username, password)
+    def create_superuser(self, email, username, password=None, **extre_fields):
+        user = self.create_user(email, username, password)
         user.is_active=True
         user.is_staff=True
         user.is_admin=True
@@ -24,12 +30,18 @@ class CustomUserModel(BaseUserManager):
         user.save(using=self._db)
         
         return user
-    
-    
+
+""" 
+    ==========================
+        USER MODEL 
+    ==========================
+"""    
 class User(AbstractBaseUser, PermissionsMixin):
     class user_type(models.TextChoices):
         EMPLOYE = 'EMPLOYE', 'Employe'
         RECUITER = 'RECUITER', 'Recuiter'
+        ADMIN = 'ADMIN','Admin'
+        NONE = '...', '...'
         
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=100)
@@ -37,7 +49,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
-    type = models.CharField(choices=user_type.choices, default=user_type.EMPLOYE)
+    type = models.CharField(choices=user_type.choices, default=user_type.NONE)
     otp = models.CharField(max_length=6, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -48,38 +60,132 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     def __str__(self):
         return f"name:{self.username} email:{self.email}"
+
+""" ============================= UNIVERSAL MODELS (COMMON MODELS) =========================""" 
+# ================= USER TYPE CHOICES ===============
+class user_type(models.TextChoices):
+    EMPLOYE = 'EMPLOYE', 'Employe'
+    RECUITER = 'RECUITER', 'Recuiter'
+    ADMIN = 'ADMIN','Admin'
+    NONE = '...', '...'
+
+# =============== SOCIAL LINKS ===================
+class SocialLinks(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_social_links')
+    type = models.TextField(choices=user_type.choices)
+    name = models.CharField(max_length=100)
+    link = models.URLField()
     
-class EmployePortfolio(models.Model):
-    employe = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employe_portfolio')
+# =============== PROTFOLIO ================
+class Portfolios(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employe_portfolio')
+    type = models.TextField(choices=user_type.choices)
     portfolio_link = models.URLField(max_length=255, null=True, blank=True) 
-    
-class EmployeResume(models.Model):
-    employe = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employe_resume')
+
+# =============== RESUME ================
+class Resumes(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employe_resume')
+    type = models.TextField(choices=user_type.choices)
     resume = models.FileField()
     
-class EmployeCertificates(models.Model):
-    employe = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employe_certificate')
+# =============== CERTIFICATE ================
+class Certificates(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employe_certificate')
+    type = models.TextField(choices=user_type.choices)
     cerficate_name = models.CharField(max_length=255)
     certificate_link = models.URLField(null=True, blank=True)
     
-class EmployeExtreFields(models.Model):
-    employe = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employe_extra_field')
+# =============== EXTRA FIELDS ================
+class ExtreFields(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employe_extra_field')
+    type = models.TextField(choices=user_type.choices)
     fild_name = models.CharField(max_length=255)
     fild_value = models.CharField(max_length=255)
     link = models.URLField(null=True, blank=True)
+    
+    
+""" ========================================================================================="""
 
+""" =========================== EMPLOYE MODELS ==========================="""
+""" 
+    ==========================
+        EMPLOYE PROFILE MODEL 
+    ==========================
+"""  
 class EmployeProfile(models.Model):
     employe = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employe_profile')
     image = models.ImageField(upload_to='user_profile_image', null=True, blank=True)
-    phone = models.CharField(max_length=11)
-    address = models.CharField(max_length=255)
-    portfolio = models.ForeignKey(EmployePortfolio, on_delete=models.CASCADE)
-    resume = models.ForeignKey(EmployeResume, on_delete=models.CASCADE)
-    certificate = models.ForeignKey(EmployeCertificates, on_delete=models.CASCADE)
-    extra_field = models.ForeignKey(EmployeExtreFields, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=11, null=True)
+    address = models.CharField(max_length=255, null=True)
+    portfolio = models.ForeignKey(Portfolios, on_delete=models.CASCADE, null=True)
+    resume = models.ForeignKey(Resumes, on_delete=models.CASCADE, null=True)
+    certificate = models.ForeignKey(Certificates, on_delete=models.CASCADE, null=True)
+    extra_field = models.ForeignKey(ExtreFields, on_delete=models.CASCADE, null=True)
+    
+    def __str__(self):
+        return f"{self.employe.username}"
     
     
+""" ======================================================================="""
+
+
+
+""" =========================== COMPANY ======================================="""
+""" 
+    ==========================
+        COMPANY DETAILS MODEL 
+    ==========================
+"""  
+class Company(models.Model):
+    class industry_type(models.TextChoices):
+        IT = 'IT', 'It'
+        MARKETING_AGENCY = "MARKETING AGENCY", "Marketing agency"
+        SOFTWARE_DEVELOPMENT ='SOFTWARE DEVELOPMENT', 'Software development'
+        GRAPHIC_DESIGNE_AGENCY = 'GRAPHIC DESIGNE AGENCY', 'Graphic designe agency'
+        DEFAULT = '...', '...'
+    name = models.CharField(max_length=200)
+    logo = models.ImageField(upload_to='company_logo')
+    website = models.URLField()
+    industry = models.TextField(choices=industry_type.choices, default=industry_type.DEFAULT)
+    description = models.TextField()
+    location = models.CharField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+""" ======================================================================="""
+
+
+
+
+""" =========================== Recuiter models ==========================="""
+""" 
+    ==========================
+        RECUITER MODEL 
+    ==========================
+"""  
+class Recuiter(models.Model):
+    class role_type(models.TextChoices):
+        ADMIN = 'ADMIN', 'Admin',
+        RECUITER = 'RECUITER', 'Recuiter' 
+        DEFAULT = '...', '...'
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recuiter')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='company_recuiter', null=True)
+    role = models.TextField(choices=role_type.choices, default=role_type.DEFAULT, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+""" 
+    ==========================
+        RECUITER PROFILE MODEL 
+    ==========================
+"""  
+class RecuiterProfile(models.Model):
+    recuiter = models.ForeignKey(Recuiter, on_delete=models.CASCADE, related_name='recuiter_profile')
+    photo = models.ImageField(upload_to='recuiter_profile_photo', null=True, blank=True)
+    summary = models.TextField(null=True)
+    social_links = models.ForeignKey(SocialLinks, on_delete=models.CASCADE, null=True, related_name='recuiter_social_links')
     
+    
+""" ======================================================================="""
     
         
         
