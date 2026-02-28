@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import User
-from .utils import GenerateOTP
 """ 
     ==================================
         USER REGISTRATION SERIALIZER 
@@ -14,20 +13,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         
         
     def create(self, validated_data):
-        
-        try:
-            user = User.objects.create_user(
-                email = validated_data.get('email'),
-                username  = validated_data.get('username'),
-                password = validated_data.get('password'),
-                type = validated_data.get('type')
-            )
-            otp = GenerateOTP()
-            print(otp)
-            user.otp = otp
-            user.save()
-        except AttributeError:
-            raise ValueError({"errro":"Otp not found"})
+        user = User.objects.create_user(
+            email = validated_data.get('email'),
+            username  = validated_data.get('username'),
+            password = validated_data.get('password'),
+            type = validated_data.get('type')
+        )
         
         return user
 
@@ -36,9 +27,10 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         OTP VERIFICATION SERIALIZER 
     ==================================
 """  
-class AccountVerificationByOtpSerializer(serializers.Serializer):
+class OTPVerificationSerializer(serializers.Serializer):
     email = serializers.EmailField()
     otp = serializers.CharField()
+    purpose = serializers.CharField()
     
 
 """ 
@@ -56,8 +48,24 @@ class ForgotPasswordSerializer(serializers.Serializer):
 """
 class ResetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    otp = serializers.CharField()
-    password = serializers.CharField()
+    new_password = serializers.CharField()
+    conferm_password = serializers.CharField()
+    
+    def validate_email(self, value):
+        if not User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("User with this email isn't exist")
+        return value
+    
+    def validate(self, data):
+        if not data['new_password'] != data['confirm_password']:
+            raise serializers.ValidationError("new password and confirm password doesn't match")
+        return data
+    
+    def update(self, instance, validated_data):
+        instance.set_password(validated_data['new_password'])
+        instance.save()
+        return instance
+    
   
   
 """ 
@@ -83,9 +91,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                 raise exceptions.AuthenticationFailed("No active account found with this user")
             if not user.is_active:
                 raise exceptions.AuthenticationFailed("Account isn't active")
-        elif user and not password:
+        elif email and not password:
             raise exceptions.AuthenticationFailed("Must inculde password")
-        elif password and not user:
+        elif password and not email:
             raise exceptions.AuthenticationFailed("Must include email")
         else:
             raise exceptions.AuthenticationFailed("Must include email and password")

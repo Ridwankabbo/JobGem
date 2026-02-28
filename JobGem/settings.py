@@ -117,7 +117,14 @@ REST_FRAMEWORK = {
     )
 }
 
-
+# Email Configurations
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
 # Internationalization
@@ -150,17 +157,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 from datetime import timedelta
 SIMPLE_JWT = {
-    'AUTHENTICATION_METHOD':'email',
+    # 'AUTHENTICATION_METHOD':'email',
     
-    'USER_ID_FIEED':'id',
-    'USER_ID_CLAIM':'user_id',
+    # 'USER_ID_FIEED':'id',
+    # 'USER_ID_CLAIM':'user_id',
     
     'ACCESS_TOKEN_LIFETIME':timedelta(hours=5),
     'REFRESH_TOKEN_LIFETIME':timedelta(days=7),
     
-    'TOKEN_OBTAIN_SERIALIZER':'user.seralizers.CustomTokenObtainPairSerializer',
+    # 'TOKEN_OBTAIN_SERIALIZER':'user.seralizers.CustomTokenObtainPairSerializer',
     
-    'AUTH_HEADER_TYPES':('Bearer',),
+    # 'AUTH_HEADER_TYPES':('Bearer',),
     
-    'TOKEN_USER_CLASS':'user.User'
+    # 'TOKEN_USER_CLASS':'user.User'
 }
