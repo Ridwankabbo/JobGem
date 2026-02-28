@@ -50,7 +50,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     type = models.CharField(choices=user_type.choices, default=user_type.NONE)
-    otp = models.CharField(max_length=6, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
     objects = CustomUserModel()

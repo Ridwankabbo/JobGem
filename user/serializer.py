@@ -49,7 +49,7 @@ class ForgotPasswordSerializer(serializers.Serializer):
 class ResetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
     new_password = serializers.CharField()
-    conferm_password = serializers.CharField()
+    confirm_password = serializers.CharField()
     
     def validate_email(self, value):
         if not User.objects.filter(email=value).exists():
@@ -57,7 +57,7 @@ class ResetPasswordSerializer(serializers.Serializer):
         return value
     
     def validate(self, data):
-        if not data['new_password'] != data['confirm_password']:
+        if not data['new_password'] == data['confirm_password']:
             raise serializers.ValidationError("new password and confirm password doesn't match")
         return data
     

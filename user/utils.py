@@ -37,6 +37,7 @@ class OtpManagement():
             return True
         return False
     
+    @classmethod
     def is_password_reset_verified(self, email):
         return cache.get(f"{email}_password_reset_verified")
     

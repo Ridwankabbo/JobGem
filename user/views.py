@@ -67,7 +67,6 @@ def OTPVerificationView(request):
                 user = User.objects.get(email=email)
                 user.is_active = True
                 user.save()
-                
             except User.DoesNotExist:
                 return Response({
                     "response":"User not found"
@@ -75,11 +74,12 @@ def OTPVerificationView(request):
             return Response({
                     "response":"OTP verified successfull"
                 }, status=status.HTTP_200_OK)
-        if purpose == 'reset_password':
+        if purpose == 'password_reset':
             return Response({
                 "message":"OTP verified successfull, now you can reset you password",
                 "email ": f"{email}"
             }, status=status.HTTP_200_OK)
+        return Response(serializer.data)
     return Response(serializer.errors)
 
 """ 
@@ -124,13 +124,13 @@ def ResetPasswordView(request):
     
     if serializer.is_valid():
         email = serializer.validated_data.get('email')
-        password = serializer.validated_data.get('password')
+        new_password = serializer.validated_data.get('new_password')
         
         if not OtpManagement.is_password_reset_verified(email):
             return Response({"response":"OTP not verified yet"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             user = User.objects.get(email=email)
-            user.set_password(password)
+            user.set_password(new_password)
             user.save()
         except User.DoesNotExist:
             return Response({"response":"User not found"}, status=status.HTTP_404_NOT_FOUND)
