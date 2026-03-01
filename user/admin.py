@@ -20,7 +20,7 @@ admin.site.register(EmployeProfile, EmployeProfileAdmin)
 
 # ===================== Company =========================
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'logo', 'website', 'industry', 'description', 'location', 'created_at']
+    list_display = ['id', 'name','slug', 'logo', 'website', 'industry', 'description', 'location', 'created_at']
 admin.site.register(Company, CompanyAdmin)
 
 # ===================== Recuiter =========================

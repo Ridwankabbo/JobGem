@@ -2,10 +2,18 @@ from django.shortcuts import render
 from rest_framework.decorators import APIView, api_view
 from rest_framework.response import Response
 from .models import User
+from rest_framework.permissions import IsAuthenticated
 from .serializer import (
     UserRegistrationSerializer,
     OTPVerificationSerializer,
     ResetPasswordSerializer,
+)
+from .models import (
+    User,
+    EmployeProfile,
+    Recuiter,
+    Company,
+    RecuiterProfile,
 )
 from .utils import OtpManagement, send_otp_mail
 from rest_framework import status
@@ -140,5 +148,63 @@ def ResetPasswordView(request):
         return Response({"response":"Password reset successfull"}, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+""" 
+    ==================================
+        USER PROFILE VIEW
+    ==================================
+"""
+from .serializer import EmployeProfileSerializer 
+class EmployeProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+    def _get_profile(self, user):
+        profile, created = EmployeProfile.objects.get_or_create(
+            employe=user
+        )
+        return profile
     
+    def get(self, request):
+        profile = self._get_profile(request.user)
+        serializer = EmployeProfileSerializer(profile, context={'request':request})
+        return Response(serializer.data)
+
+
+
+""" 
+    ==================================
+        RECUITER PROFILE VIEW
+    ==================================
+"""
+from .serializer import RecuiterProfileSerializer
+class RecuiterProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def _get_profile(self, user):
+        profile, created = RecuiterProfile.objects.get_or_create(
+            user = user
+        )
+        return profile
+    
+    def get(self, request):
+        profile = self._get_profile(request.user)
+        serializer = RecuiterProfileSerializer(profile, context={'request':request})
+        return Response(serializer.data)
+    
+    
+""" 
+    ==================================
+        COMPANY PROFILE VIEW
+    ==================================
+"""
+from .serializer import CompanyProfileSerializer
+class CompanyProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def _get_profile(self, name):
+        profile = Company.objects.get_or_create(
+            name = name
+        )
+        return profile
+    def get(self, request):
+        profile = self._get_profile(request.user)
+        serializer = CompanyProfileSerializer(profile)
+        return Response(serializer)

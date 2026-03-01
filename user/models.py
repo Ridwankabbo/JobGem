@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 # Create your models here.
 
@@ -71,41 +72,84 @@ class user_type(models.TextChoices):
 # =============== SOCIAL LINKS ===================
 class SocialLinks(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_social_links')
-    type = models.TextField(choices=user_type.choices)
     name = models.CharField(max_length=100)
     link = models.URLField()
+    added_at = models.DateTimeField(auto_now_add=True)
     
 # =============== PROTFOLIO ================
 class Portfolios(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employe_portfolio')
-    type = models.TextField(choices=user_type.choices)
     portfolio_link = models.URLField(max_length=255, null=True, blank=True) 
+    added_at = models.DateTimeField(auto_now_add=True)
 
 # =============== RESUME ================
 class Resumes(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employe_resume')
-    type = models.TextField(choices=user_type.choices)
     resume = models.FileField()
+    added_at = models.DateTimeField(auto_now_add=True)
     
 # =============== CERTIFICATE ================
 class Certificates(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employe_certificate')
-    type = models.TextField(choices=user_type.choices)
     cerficate_name = models.CharField(max_length=255)
     certificate_link = models.URLField(null=True, blank=True)
+    added_at = models.DateTimeField(auto_now_add=True)
     
 # =============== EXTRA FIELDS ================
 class ExtreFields(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employe_extra_field')
-    type = models.TextField(choices=user_type.choices)
     fild_name = models.CharField(max_length=255)
     fild_value = models.CharField(max_length=255)
     link = models.URLField(null=True, blank=True)
+    added_at = models.DateTimeField(auto_now_add=True)
     
     
 """ ========================================================================================="""
 
+""" =========================== COMPANY ======================================="""
+""" 
+    ============================
+        COMPANY DETAILS MODEL 
+    ============================
+"""  
+class Company(models.Model):
+    class industry_type(models.TextChoices):
+        IT = 'IT', 'It'
+        MARKETING_AGENCY = "MARKETING AGENCY", "Marketing agency"
+        SOFTWARE_DEVELOPMENT ='SOFTWARE DEVELOPMENT', 'Software development'
+        GRAPHIC_DESIGNE_AGENCY = 'GRAPHIC DESIGNE AGENCY', 'Graphic designe agency'
+        DEFAULT = '...', '...'
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, blank=True, null=True)
+    logo = models.ImageField(upload_to='company_logo', null=True, blank=True)
+    website = models.URLField(null=True, blank=True)
+    industry = models.TextField(choices=industry_type.choices, default=industry_type.DEFAULT)
+    description = models.TextField(null=True, blank=True)
+    location = models.CharField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{slugify(self.name)}_{self.created_at}")
+        super().save(*args, **kwargs)
+        
+    def __str__(self):
+        return f"{self.name}"
+    
+""" ======================================================================="""
+
+
+class WorkedCompanys(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='worked_companys')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    joined_at = models.DateTimeField(auto_now_add=True)
+    resigned_at = models.DateTimeField(auto_now_add=True)
+    
+
+
+
 """ =========================== EMPLOYE MODELS ==========================="""
+
 """ 
     ==========================
         EMPLOYE PROFILE MODEL 
@@ -119,6 +163,7 @@ class EmployeProfile(models.Model):
     portfolio = models.ForeignKey(Portfolios, on_delete=models.CASCADE, null=True)
     resume = models.ForeignKey(Resumes, on_delete=models.CASCADE, null=True)
     certificate = models.ForeignKey(Certificates, on_delete=models.CASCADE, null=True)
+    worked_company = models.ForeignKey(WorkedCompanys, on_delete=models.CASCADE, null=True, blank=True)
     extra_field = models.ForeignKey(ExtreFields, on_delete=models.CASCADE, null=True)
     
     def __str__(self):
@@ -126,32 +171,6 @@ class EmployeProfile(models.Model):
     
     
 """ ======================================================================="""
-
-
-
-""" =========================== COMPANY ======================================="""
-""" 
-    ==========================
-        COMPANY DETAILS MODEL 
-    ==========================
-"""  
-class Company(models.Model):
-    class industry_type(models.TextChoices):
-        IT = 'IT', 'It'
-        MARKETING_AGENCY = "MARKETING AGENCY", "Marketing agency"
-        SOFTWARE_DEVELOPMENT ='SOFTWARE DEVELOPMENT', 'Software development'
-        GRAPHIC_DESIGNE_AGENCY = 'GRAPHIC DESIGNE AGENCY', 'Graphic designe agency'
-        DEFAULT = '...', '...'
-    name = models.CharField(max_length=200)
-    logo = models.ImageField(upload_to='company_logo')
-    website = models.URLField()
-    industry = models.TextField(choices=industry_type.choices, default=industry_type.DEFAULT)
-    description = models.TextField()
-    location = models.CharField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
-""" ======================================================================="""
-
 
 
 
@@ -186,5 +205,4 @@ class RecuiterProfile(models.Model):
     
 """ ======================================================================="""
     
-        
         

@@ -1,5 +1,11 @@
 from rest_framework import serializers
-from .models import User
+from .models import (
+    User,
+    EmployeProfile,
+    Recuiter, 
+    RecuiterProfile,
+    Company
+)
 """ 
     ==================================
         USER REGISTRATION SERIALIZER 
@@ -66,7 +72,66 @@ class ResetPasswordSerializer(serializers.Serializer):
         instance.save()
         return instance
     
-  
+""" 
+    ==================================
+        USER PROFILE SERIALIZER
+    ==================================
+"""
+    
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'username',
+            'email',
+        ]
+        
+""" 
+    ==================================
+        EMPLOYE PROFILE SERIALIZER
+    ==================================
+"""
+class EmployeProfileSerializer(serializers.ModelSerializer):
+    employe = UserProfileSerializer()
+    class Meta:
+        model = EmployeProfile
+        fields=['employe', 'image', 'phone', 'address', 'portfolio','resume', 'certificate']
+        
+""" 
+    ==================================
+        RECUITER SERIALIZER
+    ==================================
+"""
+class RecuiterSerializer(serializers.ModelSerializer):
+    user = UserProfileSerializer()
+    class Meta:
+        model = Recuiter
+        fields = ['id', 'user', 'company', 'role']
+        
+""" 
+    ==================================
+        RECUITER PROFILE SERIALIZER
+    ==================================
+"""
+class RecuiterProfileSerializer(serializers.ModelSerializer):
+    retuiter = RecuiterProfile()
+    class Meta:
+        model = RecuiterProfile
+        fields = ['recuiter', 'photo', 'summary', 'social_links']
+        
+""" 
+    ==================================
+        COMPANY PROFILE SERIALIZER
+    ==================================
+"""
+class CompanyProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = ['id', 'name', 'slug', 'website', 'industry', 'discription', 'location']
+        
+        
+
   
 """ 
     =====================================
