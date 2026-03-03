@@ -72,6 +72,18 @@ class ResetPasswordSerializer(serializers.Serializer):
         instance.save()
         return instance
     
+    
+    
+""" 
+    ==================================
+        COMPANY PROFILE SERIALIZER
+    ==================================
+"""
+class CompanyProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = ['id', 'name', 'slug', 'website', 'industry', 'discription', 'location']
+    
 """ 
     ==================================
         USER PROFILE SERIALIZER
@@ -79,12 +91,14 @@ class ResetPasswordSerializer(serializers.Serializer):
 """
     
 class UserProfileSerializer(serializers.ModelSerializer):
+    worked_companies = serializers.CharField()
     class Meta:
         model = User
         fields = [
             'id',
             'username',
             'email',
+            'worked_companies',
         ]
         
 """ 
@@ -119,16 +133,6 @@ class RecuiterProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecuiterProfile
         fields = ['recuiter', 'photo', 'summary', 'social_links']
-        
-""" 
-    ==================================
-        COMPANY PROFILE SERIALIZER
-    ==================================
-"""
-class CompanyProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Company
-        fields = ['id', 'name', 'slug', 'website', 'industry', 'discription', 'location']
         
         
 

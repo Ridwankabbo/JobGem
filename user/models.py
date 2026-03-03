@@ -74,26 +74,26 @@ class SocialLinks(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_social_links')
     name = models.CharField(max_length=100)
     link = models.URLField()
-    added_at = models.DateTimeField(auto_now_add=True)
+    # added_at = models.DateTimeField(auto_now_add=True)
     
 # =============== PROTFOLIO ================
 class Portfolios(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employe_portfolio')
     portfolio_link = models.URLField(max_length=255, null=True, blank=True) 
-    added_at = models.DateTimeField(auto_now_add=True)
+
 
 # =============== RESUME ================
 class Resumes(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employe_resume')
     resume = models.FileField()
-    added_at = models.DateTimeField(auto_now_add=True)
+    # added_at = models.DateTimeField(auto_now_add=True)
     
 # =============== CERTIFICATE ================
 class Certificates(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employe_certificate')
     cerficate_name = models.CharField(max_length=255)
     certificate_link = models.URLField(null=True, blank=True)
-    added_at = models.DateTimeField(auto_now_add=True)
+    # added_at = models.DateTimeField(auto_now_add=True)
     
 # =============== EXTRA FIELDS ================
 class ExtreFields(models.Model):
@@ -101,7 +101,7 @@ class ExtreFields(models.Model):
     fild_name = models.CharField(max_length=255)
     fild_value = models.CharField(max_length=255)
     link = models.URLField(null=True, blank=True)
-    added_at = models.DateTimeField(auto_now_add=True)
+    # added_at = models.DateTimeField(auto_now_add=True)
     
     
 """ ========================================================================================="""
@@ -139,8 +139,13 @@ class Company(models.Model):
 """ ======================================================================="""
 
 
-class WorkedCompanys(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='worked_companys')
+""" 
+    ==============================
+        WORKED COMPANIES MODEL 
+    ==============================
+"""
+class WorkedCompanies(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='worked_companies')
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     joined_at = models.DateTimeField(auto_now_add=True)
     resigned_at = models.DateTimeField(auto_now_add=True)
@@ -163,7 +168,7 @@ class EmployeProfile(models.Model):
     portfolio = models.ForeignKey(Portfolios, on_delete=models.CASCADE, null=True)
     resume = models.ForeignKey(Resumes, on_delete=models.CASCADE, null=True)
     certificate = models.ForeignKey(Certificates, on_delete=models.CASCADE, null=True)
-    worked_company = models.ForeignKey(WorkedCompanys, on_delete=models.CASCADE, null=True, blank=True)
+    worked_companies = models.ForeignKey(WorkedCompanies, on_delete=models.CASCADE, null=True, blank=True)
     extra_field = models.ForeignKey(ExtreFields, on_delete=models.CASCADE, null=True)
     
     def __str__(self):

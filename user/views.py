@@ -3,7 +3,7 @@ from rest_framework.decorators import APIView, api_view
 from rest_framework.response import Response
 from .models import User
 from rest_framework.permissions import IsAuthenticated
-from .serializer import (
+from .serializers import (
     UserRegistrationSerializer,
     OTPVerificationSerializer,
     ResetPasswordSerializer,
@@ -153,7 +153,7 @@ def ResetPasswordView(request):
         USER PROFILE VIEW
     ==================================
 """
-from .serializer import EmployeProfileSerializer 
+from .serializers import EmployeProfileSerializer 
 class EmployeProfileView(APIView):
     permission_classes = [IsAuthenticated]
     def _get_profile(self, user):
@@ -174,7 +174,7 @@ class EmployeProfileView(APIView):
         RECUITER PROFILE VIEW
     ==================================
 """
-from .serializer import RecuiterProfileSerializer
+from .serializers import RecuiterProfileSerializer
 class RecuiterProfileView(APIView):
     permission_classes = [IsAuthenticated]
     
@@ -195,7 +195,7 @@ class RecuiterProfileView(APIView):
         COMPANY PROFILE VIEW
     ==================================
 """
-from .serializer import CompanyProfileSerializer
+from .serializers import CompanyProfileSerializer
 class CompanyProfileView(APIView):
     permission_classes = [IsAuthenticated]
     
