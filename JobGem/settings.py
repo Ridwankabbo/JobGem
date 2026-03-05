@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'corsheaders',
     
     # apps
-    'user'
+    'user',
+    'jobpost',
 ]
 
 MIDDLEWARE = [
