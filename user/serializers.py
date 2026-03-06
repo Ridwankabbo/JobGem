@@ -1,9 +1,7 @@
 from rest_framework import serializers
 from .models import (
     User,
-    EmployeProfile,
-    Recuiter, 
-    RecuiterProfile,
+    UserProfile,
     Company, 
     WorkedCompanies
 )
@@ -80,18 +78,18 @@ class ResetPasswordSerializer(serializers.Serializer):
         COMPANY PROFILE SERIALIZER
     ==================================
 """
-class CompanyProfileSerializer(serializers.ModelSerializer):
+class CompaniSerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         fields = ['id', 'name', 'slug', 'website', 'industry', 'discription', 'location']
     
 """ 
     ==================================
-        USER PROFILE SERIALIZER
+        USER  SERIALIZER
     ==================================
 """
     
-class UserProfileSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
@@ -106,9 +104,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
     ==================================
 """     
 class WorkdCompaniesSerializer(serializers.ModelSerializer):
+    # company = CompaniSerializer( many=True, read_only=True)
     class Meta:
         model = WorkedCompanies
-        fields = ['company', 'joined_at', 'resigned_at']
+        fields = ['id', 'user_profile', 'company', 'joined_at', 'resigned_at']
         
     def create(self, validate_data):
         user = self.context['request'].user
@@ -130,35 +129,41 @@ class WorkdCompaniesSerializer(serializers.ModelSerializer):
         EMPLOYE PROFILE SERIALIZER
     ==================================
 """
-class EmployeProfileSerializer(serializers.ModelSerializer):
-    employe = UserProfileSerializer()
-    worked = WorkdCompaniesSerializer(many=True, read_only=True)
+class UserProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    worked_companies = WorkdCompaniesSerializer()
     class Meta:
-        model = EmployeProfile
-        fields=['employe', 'image', 'phone', 'address', 'portfolio','resume', 'certificate', 'worked']
+        model = UserProfile
+        fields=['user', 'image', 'phone', 'address', 'portfolio','resume', 'certificate', 'worked_companies']
         
-""" 
-    ==================================
-        RECUITER SERIALIZER
-    ==================================
-"""
-class RecuiterSerializer(serializers.ModelSerializer):
-    user = UserProfileSerializer()
-    class Meta:
-        model = Recuiter
-        fields = ['id', 'user', 'role']
+    def validate(self, attrs):
+        profile = UserProfile.objects.filter(user = self.context['request'].user)
+        if profile:
+            return profile
+        raise ValueError("User doesn't exist")
         
-""" 
-    ==================================
-        RECUITER PROFILE SERIALIZER
-    ==================================
-"""
-class RecuiterProfileSerializer(serializers.ModelSerializer):
-    retuiter = RecuiterProfile()
-    company = WorkdCompaniesSerializer(many=True)
-    class Meta:
-        model = RecuiterProfile
-        fields = ['recuiter', 'photo', 'summary', 'social_links', 'company']
+# """ 
+#     ==================================
+#         RECUITER SERIALIZER
+#     ==================================
+# """
+# class RecuiterSerializer(serializers.ModelSerializer):
+#     user = UserProfileSerializer()
+#     class Meta:
+#         model = Recuiter
+#         fields = ['id', 'user', 'role']
+        
+# """ 
+#     ==================================
+#         RECUITER PROFILE SERIALIZER
+#     ==================================
+# """
+# class RecuiterProfileSerializer(serializers.ModelSerializer):
+#     recuiter = RecuiterSerializer()
+#     company = WorkdCompaniesSerializer(read_only=True, many=True)
+#     class Meta:
+#         model = RecuiterProfile
+#         fields = ['recuiter', 'photo', 'summary', 'social_links', 'company']
         
         
 

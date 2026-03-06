@@ -136,8 +136,31 @@ class Company(models.Model):
     def __str__(self):
         return f"{self.name}"
     
-""" ======================================================================="""
+""" ======================================================================= """
 
+
+""" =========================== EMPLOYE MODELS =========================== """
+
+""" 
+    ==========================
+        User PROFILE MODEL 
+    ==========================
+"""  
+class UserProfile(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_profile')
+    image = models.ImageField(upload_to='user_profile_image', null=True, blank=True)
+    phone = models.CharField(max_length=11, null=True, blank=True)
+    address = models.CharField(max_length=255, null=True, blank=True)
+    portfolio = models.ForeignKey(Portfolios, on_delete=models.CASCADE, null=True, blank=True, related_name='user_portfolio')
+    resume = models.ForeignKey(Resumes, on_delete=models.CASCADE, null=True, blank=True, related_name='user_resume')
+    certificate = models.ForeignKey(Certificates, on_delete=models.CASCADE, null=True, blank=True, related_name='user_ceritficates')
+    extra_field = models.ForeignKey(ExtreFields, on_delete=models.CASCADE, null=True, blank=True, related_name='user_extrafields')
+    
+    def __str__(self):
+        return f"{self.user.username}"
+    
+    
+""" ======================================================================="""
 
 """ 
     ==============================
@@ -145,8 +168,8 @@ class Company(models.Model):
     ==============================
 """
 class WorkedCompanies(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='worked_companies', null=True, blank=True)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
     joined_at = models.DateTimeField(auto_now_add=True)
     resigned_at = models.DateTimeField(null=True, blank=True)
     
@@ -154,63 +177,37 @@ class WorkedCompanies(models.Model):
         return f"{self.user.username}"
 
 
-""" =========================== EMPLOYE MODELS ==========================="""
+# """ =========================== Recuiter models ==========================="""
+# """ 
+#     ==========================
+#         RECUITER MODEL 
+#     ==========================
+# """  
+# class Recuiter(models.Model):
+#     class role_type(models.TextChoices):
+#         ADMIN = 'ADMIN', 'Admin',
+#         RECUITER = 'RECUITER', 'Recuiter' 
+#         DEFAULT = '...', '...'
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recuiter')
+#     role = models.TextField(choices=role_type.choices, default=role_type.DEFAULT, null=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
 
-""" 
-    ==========================
-        EMPLOYE PROFILE MODEL 
-    ==========================
-"""  
-class EmployeProfile(models.Model):
-    employe = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employe_profile')
-    image = models.ImageField(upload_to='user_profile_image', null=True, blank=True)
-    phone = models.CharField(max_length=11, null=True)
-    address = models.CharField(max_length=255, null=True)
-    portfolio = models.ForeignKey(Portfolios, on_delete=models.CASCADE, null=True)
-    resume = models.ForeignKey(Resumes, on_delete=models.CASCADE, null=True)
-    certificate = models.ForeignKey(Certificates, on_delete=models.CASCADE, null=True)
-    worked = models.ForeignKey(WorkedCompanies, on_delete=models.CASCADE, null=True, blank=True, related_name='worked_companies')
-    extra_field = models.ForeignKey(ExtreFields, on_delete=models.CASCADE, null=True)
-    
-    def __str__(self):
-        return f"{self.employe.username}"
-    
-    
-""" ======================================================================="""
+#     def __str__(self):
+#         return f"{self.user.username}"
 
-
-
-""" =========================== Recuiter models ==========================="""
-""" 
-    ==========================
-        RECUITER MODEL 
-    ==========================
-"""  
-class Recuiter(models.Model):
-    class role_type(models.TextChoices):
-        ADMIN = 'ADMIN', 'Admin',
-        RECUITER = 'RECUITER', 'Recuiter' 
-        DEFAULT = '...', '...'
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recuiter')
-    role = models.TextField(choices=role_type.choices, default=role_type.DEFAULT, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.user.username}"
-
-""" 
-    ==========================
-        RECUITER PROFILE MODEL 
-    ==========================
-"""  
-class RecuiterProfile(models.Model):
-    recuiter = models.ForeignKey(Recuiter, on_delete=models.CASCADE, related_name='recuiter_profile')
-    photo = models.ImageField(upload_to='recuiter_profile_photo', null=True, blank=True)
-    summary = models.TextField(null=True)
-    company = models.ForeignKey(WorkedCompanies, on_delete=models.CASCADE, null=True, blank=True, related_name='companies')
-    social_links = models.ForeignKey(SocialLinks, on_delete=models.CASCADE, null=True, related_name='recuiter_social_links')
+# """ 
+#     ==========================
+#         RECUITER PROFILE MODEL 
+#     ==========================
+# """  
+# class RecuiterProfile(models.Model):
+#     recuiter = models.ForeignKey(Recuiter, on_delete=models.CASCADE, related_name='recuiter_profile')
+#     photo = models.ImageField(upload_to='recuiter_profile_photo', null=True, blank=True)
+#     summary = models.TextField(null=True)
+#     company = models.ForeignKey(WorkedCompanies, on_delete=models.CASCADE, null=True, blank=True, related_name='companies')
+#     social_links = models.ForeignKey(SocialLinks, on_delete=models.CASCADE, null=True, related_name='recuiter_social_links')
     
     
-""" ======================================================================="""
+# """ ======================================================================="""
     
         

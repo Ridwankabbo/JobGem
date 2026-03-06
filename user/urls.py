@@ -8,8 +8,7 @@ from .views import (
     LoginView,
     RequestOTPView,
     ResetPasswordView,
-    EmployeProfileView,
-    RecuiterProfileView,
+    UserProfileView,
     CompanyProfileView,
     WorkedCompaniesView
 )
@@ -21,8 +20,8 @@ urlpatterns = [
     path('request-otp/', RequestOTPView, name='request-otp'),
     path('reset-password/', ResetPasswordView, name='reset-password'),
     
-    path('profile/', EmployeProfileView.as_view(), name='employe-profile'),
-    path('recuiter-profile/', RecuiterProfileView.as_view(), name='recuiter_profile'),
+    path('profile/', UserProfileView.as_view(), name='employe-profile'),
+    # path('recuiter-profile/', RecuiterProfileView.as_view(), name='recuiter_profile'),
     path('worked-companies/', WorkedCompaniesView.as_view(), name='worked-companies'),
     path('company-profile/', CompanyProfileView.as_view(), name='company-profile'),
 ]

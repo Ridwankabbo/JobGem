@@ -1,9 +1,7 @@
 from django.contrib import admin
 from .models import(
     User,
-    EmployeProfile,
-    Recuiter,
-    RecuiterProfile,
+    UserProfile,
     Company, 
     WorkedCompanies
 )
@@ -15,25 +13,25 @@ class UserAdmin(admin.ModelAdmin):
 admin.site.register(User, UserAdmin)
 
 # ===================== Employe profile =========================
-class EmployeProfileAdmin(admin.ModelAdmin):
-    list_display = ['id', 'employe', 'image', 'phone', 'address', 'portfolio', 'resume', 'certificate', 'extra_field']
-admin.site.register(EmployeProfile, EmployeProfileAdmin)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'image', 'phone', 'address', 'portfolio', 'resume', 'certificate', 'extra_field']
+admin.site.register(UserProfile, UserProfileAdmin)
 
 # ===================== Company =========================
 class CompanyAdmin(admin.ModelAdmin):
     list_display = ['id', 'name','slug', 'logo', 'website', 'industry', 'description', 'location', 'created_at']
 admin.site.register(Company, CompanyAdmin)
 
-# ===================== Recuiter =========================
-class RecuiterAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'role', 'created_at']
-admin.site.register(Recuiter, RecuiterAdmin)
+# # ===================== Recuiter =========================
+# class RecuiterAdmin(admin.ModelAdmin):
+#     list_display = ['id', 'user', 'role', 'created_at']
+# admin.site.register(Recuiter, RecuiterAdmin)
 
 class WorkedCompaniesAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'company', 'joined_at', 'resigned_at']
+    list_display = ['id', 'company', 'joined_at', 'resigned_at']
 admin.site.register(WorkedCompanies, WorkedCompaniesAdmin)
 
-# ===================== Recuiter profile =========================
-class RecuiterProfileAdmin(admin.ModelAdmin):
-    list_display = ['id', 'recuiter', 'photo', 'summary']
-admin.site.register(RecuiterProfile, RecuiterProfileAdmin)
+# # ===================== Recuiter profile =========================
+# class RecuiterProfileAdmin(admin.ModelAdmin):
+#     list_display = ['id', 'recuiter', 'photo', 'summary']
+# admin.site.register(RecuiterProfile, RecuiterProfileAdmin)

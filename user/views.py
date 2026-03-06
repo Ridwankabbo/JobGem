@@ -11,10 +11,8 @@ from .serializers import (
 )
 from .models import (
     User,
-    EmployeProfile,
-    Recuiter,
+    UserProfile,
     Company,
-    RecuiterProfile,
     WorkedCompanies,
 )
 from .utils import OtpManagement, send_otp_mail
@@ -155,23 +153,23 @@ def ResetPasswordView(request):
         USER PROFILE VIEW
     ==================================
 """
-from .serializers import EmployeProfileSerializer 
-class EmployeProfileView(APIView):
+from .serializers import UserProfileSerializer 
+class UserProfileView(APIView):
     permission_classes = [IsAuthenticated]
     def _get_profile(self, user):
-        profile, created = EmployeProfile.objects.get_or_create(
-            employe=user
+        profile = UserProfile.objects.get(
+            user=user
         )
         return profile
     
     def get(self, request):
         profile = self._get_profile(request.user)
-        serializer = EmployeProfileSerializer(profile, context={'request':request})
+        serializer = UserProfileSerializer(profile, context={'request':request})
         return Response(serializer.data)
     
     def patch(self, request):
         profile = self._get_profile(request.user)
-        serializer = EmployeProfileSerializer(profile, data=request.data, partial=True)
+        serializer = UserProfileSerializer(profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -179,33 +177,32 @@ class EmployeProfileView(APIView):
 
 
 
-""" 
-    ==================================
-        RECUITER PROFILE VIEW
-    ==================================
-"""
-from .serializers import RecuiterProfileSerializer
-class RecuiterProfileView(APIView):
-    permission_classes = [IsAuthenticated]
+# """ 
+#     ==================================
+#         RECUITER PROFILE VIEW
+#     ==================================
+# """
+# class RecuiterProfileView(APIView):
+    # permission_classes = [IsAuthenticated]
     
-    def _get_profile(self, user):
-        profile, created = RecuiterProfile.objects.get_or_create(
-            user = user
-        )
-        return profile
+    # def _get_profile(self, user):
+    #     profile = RecuiterProfile.objects.get(
+    #         recuiter__user = user
+    #     )
+    #     return profile
     
-    def get(self, request):
-        profile = self._get_profile(request.user)
-        serializer = RecuiterProfileSerializer(profile, context={'request':request})
-        return Response(serializer.data)
+    # def get(self, request):
+    #     profile = self._get_profile(request.user)
+    #     serializer = RecuiterProfileSerializer(profile)
+    #     return Response(serializer.data)
     
-    def patch(self, request):
-        profile = self._get_profile(request.user)
-        serializer = RecuiterProfileSerializer(profile, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors)
+    # def patch(self, request):
+    #     profile = self._get_profile(request.user)
+    #     serializer = RecuiterProfileSerializer(profile, data=request.data, partial=True)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data)
+    #     return Response(serializer.errors)
     
 """ 
     ==================================
@@ -240,7 +237,7 @@ class WorkedCompaniesView(APIView):
         COMPANY PROFILE VIEW
     ==============================
 """
-from .serializers import CompanyProfileSerializer
+from .serializers import CompaniSerializer
 class CompanyProfileView(APIView):
     permission_classes = [IsAuthenticated]
     
@@ -251,7 +248,7 @@ class CompanyProfileView(APIView):
         return profile
     def get(self, request):
         profile = self._get_profile(request.user)
-        serializer = CompanyProfileSerializer(profile)
+        serializer = CompaniSerializer(profile)
         return Response(serializer)
     
     def patch(self, request):
