@@ -4,7 +4,8 @@ from .models import(
     EmployeProfile,
     Recuiter,
     RecuiterProfile,
-    Company
+    Company, 
+    WorkedCompanies
 )
 # Register your models here.
 
@@ -25,8 +26,12 @@ admin.site.register(Company, CompanyAdmin)
 
 # ===================== Recuiter =========================
 class RecuiterAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'company', 'role', 'created_at']
+    list_display = ['id', 'user', 'role', 'created_at']
 admin.site.register(Recuiter, RecuiterAdmin)
+
+class WorkedCompaniesAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'company', 'joined_at', 'resigned_at']
+admin.site.register(WorkedCompanies, WorkedCompaniesAdmin)
 
 # ===================== Recuiter profile =========================
 class RecuiterProfileAdmin(admin.ModelAdmin):

@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import EmployeProfile, User, Recuiter, RecuiterProfile
+from .models import EmployeProfile, User, Recuiter, RecuiterProfile, WorkedCompanies
 
 user = settings.AUTH_USER_MODEL
 
@@ -11,7 +11,8 @@ def create_profile(sender, instance, created, **kwargs):
         print("created True")
         if instance.type == User.user_type.EMPLOYE:
             EmployeProfile.objects.create(employe=instance)
-            
+            WorkedCompanies.objects.create(user= instance)
         if instance.type == User.user_type.RECUITER:
             recuiter = Recuiter.objects.create(user=instance)
             RecuiterProfile.objects.create(recuiter = recuiter)
+            WorkedCompanies.objects.create(user=instance)

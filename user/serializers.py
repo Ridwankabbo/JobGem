@@ -4,7 +4,8 @@ from .models import (
     EmployeProfile,
     Recuiter, 
     RecuiterProfile,
-    Company
+    Company, 
+    WorkedCompanies
 )
 """ 
     ==================================
@@ -91,15 +92,38 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
 """
     
 class UserProfileSerializer(serializers.ModelSerializer):
-    worked_companies = serializers.CharField()
     class Meta:
         model = User
         fields = [
             'id',
             'username',
             'email',
-            'worked_companies',
         ]
+        
+""" 
+    ==================================
+        WORKED PROFILE SERIALIZER
+    ==================================
+"""     
+class WorkdCompaniesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkedCompanies
+        fields = ['company', 'joined_at', 'resigned_at']
+        
+    def create(self, validate_data):
+        user = self.context['request'].user
+        
+        try:
+            work = WorkedCompanies.objects.create(
+                user = user,
+                company = validate_data.get('company')
+            )
+            
+        except AttributeError:
+            raise ValueError("user not found")
+        
+        return work
+        
         
 """ 
     ==================================
@@ -108,9 +132,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
 """
 class EmployeProfileSerializer(serializers.ModelSerializer):
     employe = UserProfileSerializer()
+    worked = WorkdCompaniesSerializer(many=True, read_only=True)
     class Meta:
         model = EmployeProfile
-        fields=['employe', 'image', 'phone', 'address', 'portfolio','resume', 'certificate']
+        fields=['employe', 'image', 'phone', 'address', 'portfolio','resume', 'certificate', 'worked']
         
 """ 
     ==================================
@@ -121,7 +146,7 @@ class RecuiterSerializer(serializers.ModelSerializer):
     user = UserProfileSerializer()
     class Meta:
         model = Recuiter
-        fields = ['id', 'user', 'company', 'role']
+        fields = ['id', 'user', 'role']
         
 """ 
     ==================================
@@ -130,9 +155,10 @@ class RecuiterSerializer(serializers.ModelSerializer):
 """
 class RecuiterProfileSerializer(serializers.ModelSerializer):
     retuiter = RecuiterProfile()
+    company = WorkdCompaniesSerializer(many=True)
     class Meta:
         model = RecuiterProfile
-        fields = ['recuiter', 'photo', 'summary', 'social_links']
+        fields = ['recuiter', 'photo', 'summary', 'social_links', 'company']
         
         
 

@@ -10,7 +10,8 @@ from .views import (
     ResetPasswordView,
     EmployeProfileView,
     RecuiterProfileView,
-    CompanyProfileView
+    CompanyProfileView,
+    WorkedCompaniesView
 )
 urlpatterns = [
     path('user-registration/', UserRegistrationView, name='user-registration'),
@@ -22,5 +23,6 @@ urlpatterns = [
     
     path('profile/', EmployeProfileView.as_view(), name='employe-profile'),
     path('recuiter-profile/', RecuiterProfileView.as_view(), name='recuiter_profile'),
+    path('worked-companies/', WorkedCompaniesView.as_view(), name='worked-companies'),
     path('company-profile/', CompanyProfileView.as_view(), name='company-profile'),
 ]

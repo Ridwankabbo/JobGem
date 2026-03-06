@@ -145,12 +145,13 @@ class Company(models.Model):
     ==============================
 """
 class WorkedCompanies(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='worked_companies')
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
     joined_at = models.DateTimeField(auto_now_add=True)
-    resigned_at = models.DateTimeField(auto_now_add=True)
+    resigned_at = models.DateTimeField(null=True, blank=True)
     
-
+    def __str__(self):
+        return f"{self.user.username}"
 
 
 """ =========================== EMPLOYE MODELS ==========================="""
@@ -168,7 +169,7 @@ class EmployeProfile(models.Model):
     portfolio = models.ForeignKey(Portfolios, on_delete=models.CASCADE, null=True)
     resume = models.ForeignKey(Resumes, on_delete=models.CASCADE, null=True)
     certificate = models.ForeignKey(Certificates, on_delete=models.CASCADE, null=True)
-    worked_companies = models.ForeignKey(WorkedCompanies, on_delete=models.CASCADE, null=True, blank=True)
+    worked = models.ForeignKey(WorkedCompanies, on_delete=models.CASCADE, null=True, blank=True, related_name='worked_companies')
     extra_field = models.ForeignKey(ExtreFields, on_delete=models.CASCADE, null=True)
     
     def __str__(self):
@@ -191,10 +192,11 @@ class Recuiter(models.Model):
         RECUITER = 'RECUITER', 'Recuiter' 
         DEFAULT = '...', '...'
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recuiter')
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='company_recuiter', null=True)
     role = models.TextField(choices=role_type.choices, default=role_type.DEFAULT, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.user.username}"
 
 """ 
     ==========================
@@ -205,6 +207,7 @@ class RecuiterProfile(models.Model):
     recuiter = models.ForeignKey(Recuiter, on_delete=models.CASCADE, related_name='recuiter_profile')
     photo = models.ImageField(upload_to='recuiter_profile_photo', null=True, blank=True)
     summary = models.TextField(null=True)
+    company = models.ForeignKey(WorkedCompanies, on_delete=models.CASCADE, null=True, blank=True, related_name='companies')
     social_links = models.ForeignKey(SocialLinks, on_delete=models.CASCADE, null=True, related_name='recuiter_social_links')
     
     

@@ -7,6 +7,7 @@ from .serializers import (
     UserRegistrationSerializer,
     OTPVerificationSerializer,
     ResetPasswordSerializer,
+    WorkdCompaniesSerializer
 )
 from .models import (
     User,
@@ -14,6 +15,7 @@ from .models import (
     Recuiter,
     Company,
     RecuiterProfile,
+    WorkedCompanies,
 )
 from .utils import OtpManagement, send_otp_mail
 from rest_framework import status
@@ -166,6 +168,14 @@ class EmployeProfileView(APIView):
         profile = self._get_profile(request.user)
         serializer = EmployeProfileSerializer(profile, context={'request':request})
         return Response(serializer.data)
+    
+    def patch(self, request):
+        profile = self._get_profile(request.user)
+        serializer = EmployeProfileSerializer(profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
 
 
 
@@ -189,11 +199,46 @@ class RecuiterProfileView(APIView):
         serializer = RecuiterProfileSerializer(profile, context={'request':request})
         return Response(serializer.data)
     
+    def patch(self, request):
+        profile = self._get_profile(request.user)
+        serializer = RecuiterProfileSerializer(profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
     
 """ 
     ==================================
-        COMPANY PROFILE VIEW
+        WORKED COMPANIES VIEW
     ==================================
+"""
+class WorkedCompaniesView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        serializer = WorkdCompaniesSerializer(request.data)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = WorkdCompaniesSerializer(data=request.data, context={"request":request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+    
+    def patch(self, request):
+        worked_company = WorkedCompanies.objects.filter(user=request.user)
+        serializer = WorkdCompaniesSerializer(worked_company, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+    
+    
+""" 
+    ==============================
+        COMPANY PROFILE VIEW
+    ==============================
 """
 from .serializers import CompanyProfileSerializer
 class CompanyProfileView(APIView):
@@ -208,3 +253,11 @@ class CompanyProfileView(APIView):
         profile = self._get_profile(request.user)
         serializer = CompanyProfileSerializer(profile)
         return Response(serializer)
+    
+    def patch(self, request):
+        profile = self._get_profile(request.user)
+        serializer = CompanyProfileSerializer(profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
