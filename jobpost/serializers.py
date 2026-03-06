@@ -21,4 +21,26 @@ class JobPostSerializer(serializers.ModelSerializer):
 class JobApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Applications
-        fields = '__all__'
+        fields = ['id','seeker', 'job', 'status', 'applied_at']
+        read_only_fields = ['seeker']
+        
+    def validate(self, data):
+        if Applications.objects.filter(seeker=self.context['request'].user, job=data['job']).exists():
+            raise serializers.ValidationError("This user already applied for this job")
+        return data
+
+        
+    def create(self, validated_data):
+        seeker = self.context['request'].user
+        
+        try:
+            application = Applications.objects.create(
+                seeker = seeker,
+                job = validated_data.get('job'),
+            )
+        except AttributeError:
+            raise ValueError({
+                "response":"user not found"
+            })
+            
+        return application

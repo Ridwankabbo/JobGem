@@ -46,3 +46,29 @@ class HiringPostView(APIView):
         return Response({
             "response":f"{serializer.errors}"
         }, status=status.HTTP_400_BAD_REQUEST)
+
+""" 
+    ===========================
+        JOB APPLICATION VIEW
+    ===========================
+"""    
+class ApplayJobApplication(APIView):
+    
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        applications = Applications.objects.filter(seeker=request.user)
+        serialzer = JobApplicationSerializer(applications,  many=True)
+        return Response(serialzer.data)
+    
+    def post(self, request):
+        serializer = JobApplicationSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "response":"Successfuly Applied"
+            }, status=status.HTTP_200_OK)
+        return Response({
+            'response':f"{serializer.errors}"
+        }, status=status.HTTP_400_BAD_REQUEST)
+            
