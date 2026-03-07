@@ -104,7 +104,7 @@ class UserSerializer(serializers.ModelSerializer):
     ==================================
 """     
 class WorkdCompaniesSerializer(serializers.ModelSerializer):
-    # company = CompaniSerializer( many=True, read_only=True)
+    company = CompaniSerializer( many=True, read_only=True)
     class Meta:
         model = WorkedCompanies
         fields = ['id', 'user_profile', 'company', 'joined_at', 'resigned_at']
@@ -126,7 +126,7 @@ class WorkdCompaniesSerializer(serializers.ModelSerializer):
         
 """ 
     ==================================
-        EMPLOYE PROFILE SERIALIZER
+        USER PROFILE SERIALIZER
     ==================================
 """
 class UserProfileSerializer(serializers.ModelSerializer):

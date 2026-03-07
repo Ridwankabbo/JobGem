@@ -253,7 +253,7 @@ class CompanyProfileView(APIView):
     
     def patch(self, request):
         profile = self._get_profile(request.user)
-        serializer = CompanyProfileSerializer(profile, data=request.data, partial=True)
+        serializer = CompaniSerializer(profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
