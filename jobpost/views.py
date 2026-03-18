@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import JobPost, Applications
+from django.db.models import Q
 from .serializers import JobApplicationSerializer, JobPostSerializer
 from rest_framework.permissions import IsAuthenticated
 from .permissions import (
@@ -19,15 +20,31 @@ from rest_framework import status
 class JobPostView(APIView):
     
     def get(self, request):
-        jobs = JobPost.objects.all()
+        querry = request.GET.get('querry')
+        job_filter = Q()
+        if querry is not None:
+            words = querry.split()
+            for word in words:
+                job_filter &= (
+                    Q(title__icontains=word) | 
+                    Q(description__icontains=word)
+                )
+            jobs = JobPost.objects.filter(job_filter, status="OPEN").distinct()
+            # print(jobs)
+            serializer = JobPostSerializer(jobs, many=True)
+            return Response(serializer.data)
+        
+        jobs = JobPost.objects.filter(status='OPEN').all()
         serializer = JobPostSerializer(jobs, many=True)
         return Response(serializer.data)
     
-    def post(self, request):
-        query = request.data.get('query')
-        jobs = JobPost.objects.filter(title=query, status="OPEN")
-        serializer = JobPostSerializer(jobs, many=True)
-        return Response(serializer.data)
+
+    
+    # def post(self, request):
+    #     query = request.data.get('query')
+    #     jobs = JobPost.objects.filter(title=query, status="OPEN")
+    #     serializer = JobPostSerializer(jobs, many=True)
+    #     return Response(serializer.data)
     
 """ 
     ========================
@@ -46,6 +63,21 @@ class HiringPostView(APIView):
         return Response({
             "response":f"{serializer.errors}"
         }, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+    def patch(self, request):
+        post = JobPost.objects.get(id=request.data.get('post_id'))
+        serializer = JobPostSerializer(post, data = request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"response":"Post updated successfully"})
+        return Response({"response":f"{serializer.errors}"})
+    
+    
+    def delete(self, request):
+        post_id = request.data.get('post_id')
+        JobPost.objects.get(id=post_id).delete()
+        return Response({"response":"post delited"})
 
 """ 
     ===========================
@@ -71,4 +103,9 @@ class ApplayJobApplication(APIView):
         return Response({
             'response':f"{serializer.errors}"
         }, status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self, request):
+        post_id = request.data.get('post_id')
+        Applications.objects.get(job=post_id).delete()
+        return Response({"response":"application delited"})
             

@@ -79,7 +79,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'JobGem.wsgi.application'
 
 
-# Database
+# ==================== Database configuration ====================
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 import dj_database_url
@@ -89,6 +89,7 @@ DATABASES = {
         conn_max_age=600,
     )
 }
+# =================================================================
 
 AUTH_USER_MODEL = 'user.User'
 
@@ -110,15 +111,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# REST FRAMEWORK
+
+# ========================== REST FRAMEWORK ============================
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
+# ======================================================================
 
-# Email Configurations
+
+# ================= Email Configurations ====================
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -126,6 +130,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+# ===========================================================
 
 
 # Internationalization
@@ -145,14 +150,18 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+
 # =============== Media configuration =============
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+#==================================================
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 
 # ==================== SIMPLE JWT CONFIGURATION =======================
 
@@ -172,3 +181,12 @@ SIMPLE_JWT = {
     
     # 'TOKEN_USER_CLASS':'user.User'
 }
+#======================================================================
+
+
+# ============ CORS configration ============
+CORS_ALLOW_ALL_ORIGINS=False
+CORS_ALLODER_ORIGINS={
+    'http://localhost:5173'
+}
+#============================================
