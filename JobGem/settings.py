@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-inuloj=3h4^ifdjww--rz8+o4*sgy8hc56&7g%dp9r$c#7p+38
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     # apps
     'user',
     'jobpost',
+    'ai',
 ]
 
 MIDDLEWARE = [
@@ -162,6 +163,17 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# ==================== Channel configuration ==================
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],  # Redis server
+        },
+    },
+}
+# =============================================================
+
 
 # ==================== SIMPLE JWT CONFIGURATION =======================
 
@@ -187,6 +199,10 @@ SIMPLE_JWT = {
 # ============ CORS configration ============
 CORS_ALLOW_ALL_ORIGINS=False
 CORS_ALLODER_ORIGINS={
-    'http://localhost:5173'
+    'http://localhost:5173',
+    'http://192.168.1.107:5173'
 }
 #============================================
+
+# ================== GEMINI CONFIGURATION ===============
+GEMINI_API_KEY = config('GEMINI_API_KEY')

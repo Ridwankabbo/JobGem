@@ -10,8 +10,17 @@ from .models import JobPost, Applications
 class JobPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobPost
-        fields = ['id', 'title', 'company', 'description', 'requirements', 'location', 'vacancy', 'experience', 'status', 'dedline']
+        fields = ['id', 'title', 'company', 'location', 'experience', 'status', 'dedline']
         
+""" 
+    ==============================
+        JOB POST DETAILS SERIALIZER
+    ==============================
+"""
+class JobPostDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobPost
+        fields = ['id', 'title', 'company', 'description', 'requirements', 'location', 'vacancy', 'experience', 'status', 'dedline', 'posted_at']
 
 """ 
     ==============================

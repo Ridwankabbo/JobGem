@@ -1,7 +1,11 @@
 from django.shortcuts import render
 from .models import JobPost, Applications
 from django.db.models import Q
-from .serializers import JobApplicationSerializer, JobPostSerializer
+from .serializers import (
+    JobApplicationSerializer,
+    JobPostSerializer,
+    JobPostDetailsSerializer ,
+)
 from rest_framework.permissions import IsAuthenticated
 from .permissions import (
     IsCompanyRecuiter,
@@ -29,26 +33,30 @@ class JobPostView(APIView):
                     Q(title__icontains=word) | 
                     Q(description__icontains=word)
                 )
-            jobs = JobPost.objects.filter(job_filter, status="OPEN").distinct()
+            jobs = JobPost.objects.filter(job_filter, status="OPEN").order_by('-posted_at').distinct()
             # print(jobs)
             serializer = JobPostSerializer(jobs, many=True)
             return Response(serializer.data)
         
-        jobs = JobPost.objects.filter(status='OPEN').all()
+        jobs = JobPost.objects.filter(status='OPEN').all().order_by('-posted_at').distinct()
         serializer = JobPostSerializer(jobs, many=True)
         return Response(serializer.data)
     
-
+""" 
+    =============================
+        VIEW JOBS POST DETAILS
+    =============================
+"""  
+@api_view(['GET'])
+def PostDetailsView(request, post_id):
+    post = JobPost.objects.get(id=post_id)
+    serializer = JobPostDetailsSerializer(post)
+    return Response(serializer.data)
     
-    # def post(self, request):
-    #     query = request.data.get('query')
-    #     jobs = JobPost.objects.filter(title=query, status="OPEN")
-    #     serializer = JobPostSerializer(jobs, many=True)
-    #     return Response(serializer.data)
     
 """ 
     ========================
-        HIRING VIEW
+        HIRING POST VIEW
     ========================
 """
 class HiringPostView(APIView):

@@ -1,0 +1,73 @@
+from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
+import json
+from .ai_tools import search_jobs, applay_job
+from .agent_logic import run_agent
+from .models import ChatHistory
+from rest_framework_simplejwt.tokens import UntypedToken
+from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.exceptions import InvalidToken
+from django.core.exceptions import ObjectDoesNotExist
+
+User = get_user_model()
+
+class AiAgentConsummer(AsyncWebsocketConsumer):
+    
+    async def connect(self):
+        token = self.scope['query_string'].decode('token=')[-1]
+        
+        try:
+            validate_token = UntypedToken(token)
+            user_id = validate_token['user_id']
+            self.user = await database_sync_to_async(User.objects.get)(id=user_id)
+            self.scope['user'] = self.user
+        except(InvalidToken, ObjectDoesNotExist, KeyError):
+            self.close(code=4001)
+            return
+
+        await self.accept()
+        await self.send(text_data=json.dumps({
+            "type": "welcome",
+            "message": "হ্যালো! আমি আপনার বাংলা জব এআই অ্যাসিস্ট্যান্ট। কোন জব খুঁজবেন বা অ্যাপ্লাই করবেন?"
+        }))
+        
+        
+    async def receive(self, text_data = None):
+        data = json.loads(text_data)
+        message = data['message']
+        
+        chat_history = await database_sync_to_async(ChatHistory.objects.create)(
+            user = self.user, message=message
+        )
+        
+        history = await self.get_history()
+        
+        agent_response = await database_sync_to_async(run_agent)(
+            user_query=message,
+            history_list=history,
+        )
+        
+        # Save agent reply
+        chat_history.response=agent_response
+        await database_sync_to_async(chat_history.save)()
+        
+        
+        # Send back to React (frontend can parse MESSAGE / DATA)
+        await self.send(text_data=json.dumps({
+            "type": "agent_response",
+            "message": agent_response
+        }))
+    
+    
+    @database_sync_to_async
+    def get_history(self):
+        msgs = ChatHistory.objects.filter(user=self.user).order_by('-timestamp')[:10]
+        return [
+            {"user": m.message , 
+             "agent": m.response}
+            for m in msgs
+        ]
+     
+
+
+
