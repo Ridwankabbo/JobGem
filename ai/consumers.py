@@ -14,7 +14,7 @@ User = get_user_model()
 class AiAgentConsummer(AsyncWebsocketConsumer):
     
     async def connect(self):
-        token = self.scope['query_string'].decode('token=')[-1]
+        token = self.scope['query_string'].decode().split('token=')[-1]
         
         try:
             validate_token = UntypedToken(token)
@@ -29,7 +29,7 @@ class AiAgentConsummer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "type": "welcome",
             "message": "হ্যালো! আমি আপনার বাংলা জব এআই অ্যাসিস্ট্যান্ট। কোন জব খুঁজবেন বা অ্যাপ্লাই করবেন?"
-        }))
+        }, ensure_ascii=False))
         
         
     async def receive(self, text_data = None):
@@ -56,12 +56,12 @@ class AiAgentConsummer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "type": "agent_response",
             "message": agent_response
-        }))
+        }, ensure_ascii=False))
     
     
     @database_sync_to_async
     def get_history(self):
-        msgs = ChatHistory.objects.filter(user=self.user).order_by('-timestamp')[:10]
+        msgs = ChatHistory.objects.filter(user=self.user).order_by('-responsed_at')[:10]
         return [
             {"user": m.message , 
              "agent": m.response}

@@ -7,9 +7,9 @@ from langchain_google_genai import HarmBlockThreshold, HarmCategory
 from django.conf import settings
 from .ai_tools import search_jobs, applay_job
 
-def run_agent(user_querry, histroy_list=[]):
+def run_agent(user_query, history_list=[]):
     llm = ChatGoogleGenerativeAI(
-        model = 'Gemini-2.5-flash',
+        model = 'gemini-2.5-flash',
         temperature = 0, 
         google_api_key = settings.GEMINI_API_KEY,
         safety_settings={
@@ -18,6 +18,14 @@ def run_agent(user_querry, histroy_list=[]):
     )
     
     tools = [search_jobs, applay_job]
+    
+    # === INJECT HISTORY + USER ID INTO PROMPT (your logic preserved) ===
+    history_text = ""
+    if history_list:
+        history_text = "\n".join([
+            f"Previous conversation:\nUser: {h['user']}\nAgent: {h['agent']}\n"
+            for h in history_list[-10:]  # last 10 turns only
+        ])
     
     instructions = """ 
         You are a Banglay job ai assinstant.
@@ -62,5 +70,5 @@ def run_agent(user_querry, histroy_list=[]):
         
     )
     
-    result = agent_executor.invoke({'input': user_querry})
+    result = agent_executor.invoke({'input': user_query, 'history': history_text})
     return result['output']

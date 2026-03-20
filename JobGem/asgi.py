@@ -11,7 +11,7 @@ import os
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
-# import stories.routing  # We'll create this later
+from ai.routing import websocket_urlpatterns
 
 from django.core.asgi import get_asgi_application
 
@@ -19,9 +19,5 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'JobGem.settings')
 
 application = ProtocolTypeRouter({
     'http': get_asgi_application(),
-    'websocket': AuthMiddlewareStack(
-        URLRouter(
-            # stories.routing.websocket_urlpatterns
-        )
-    ),
+    'websocket': AuthMiddlewareStack(URLRouter(websocket_urlpatterns)),
 })
