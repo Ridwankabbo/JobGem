@@ -8,6 +8,7 @@ from rest_framework_simplejwt.tokens import UntypedToken
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.exceptions import InvalidToken
 from django.core.exceptions import ObjectDoesNotExist
+import re
 
 User = get_user_model()
 
@@ -51,12 +52,35 @@ class AiAgentConsummer(AsyncWebsocketConsumer):
         chat_history.response=agent_response
         await database_sync_to_async(chat_history.save)()
         
+        message_text = re.search(r"MESSAGE:\s*(.*?)(?=DATA:|$)", agent_response, re.DOTALL)
+        data_json = re.search(r"DATA:\s*(\[.*\])", agent_response, re.DOTALL)
+        
+        chat_text = message_text.group(1).strip() if message_text else data_json
+        
+        product_data=[]
+        
+        if data_json:
+            try:
+                product_data = json.loads(data_json.group(1))
+            except:
+                product_data = []
+        
         
         # Send back to React (frontend can parse MESSAGE / DATA)
+        
         await self.send(text_data=json.dumps({
             "type": "agent_response",
-            "message": agent_response
+            "message": chat_text,
+            "data": product_data
         }, ensure_ascii=False))
+    
+    # async def send_responsed(self, message, data):
+    #     await self.send(text_data=json.dumps({
+    #         "type": "agent_response",
+    #         "message": message,
+    #         "data": data
+            
+    #     }, ensure_ascii=False))
     
     
     @database_sync_to_async

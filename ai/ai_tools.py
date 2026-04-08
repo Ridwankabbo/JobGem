@@ -9,9 +9,10 @@ from django.db.models import Q
 def search_jobs(querry:str):
     """ 
     Search for job postes in database.
-    Search for products using fuzzy matching. Handles typos (e.g., 'frout' -> 'fruit') and plurals (e.g., 'mobiles' -> 'mobile') and (synonyms like mobile and phoner are basically same).
+    Search for products using fuzzy matching. Handles typos (e.g., 'frout' -> 'fruit') and plurals (e.g., 'jobs' -> 'job') and (synonyms like mobile and phoner are basically same).
     Use this when the user asks to see job post, find posts, or searches for a specific posts.
-    Input should be a search string like 'python/java/php' or 'django/flask/Laravel/Springboot'.
+    Input should be a search string like '"python/Django/java/Spring boot /php/ Laravel/ wordpress/ shopify" developer'.
+    Ignore all capital and small letter mismatch. 
     """
     
     words = querry.split()
