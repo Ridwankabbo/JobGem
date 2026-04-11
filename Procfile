@@ -1,0 +1,1 @@
+web: daphne  JobGem.asgi:application

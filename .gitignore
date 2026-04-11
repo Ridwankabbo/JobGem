@@ -2,4 +2,3 @@ env
 .env
 media
 Dockerfile
-docker-compose.yml
