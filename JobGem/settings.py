@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-inuloj=3h4^ifdjww--rz8+o4*sgy8hc56&7g%dp9r$c#7p+38
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['jobgem.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
